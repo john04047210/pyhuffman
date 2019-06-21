@@ -3,7 +3,7 @@
 - $ python setup.py install
 ----
 # Usage:
-- compress & decompress:
+- compress & decompress:<br>
 python实现
 ```python
 #-*- coding:utf-8 -*-
