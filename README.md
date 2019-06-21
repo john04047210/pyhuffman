@@ -27,3 +27,9 @@ if __name__ == '__main__':
 - $ python -m pip install --user --upgrade setuptools wheel twine
 - $ python setup.py sdist bdist_wheel
 - $ python -m twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+----
+# Upload TestPyPI
+- $ python -m pip install --user --upgrade setuptools wheel twine
+- $ python setup.py sdist bdist_wheel
+- $ python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+- $ python -m pip install --index-url https://test.pypi.org/simple/ --no-deps PycHuffman
