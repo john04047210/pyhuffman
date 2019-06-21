@@ -4,8 +4,8 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='PycHuffman', 
-    version='1.0', 
+    name='PycHuffman',
+    version='1.1',
     author='QiaoPeng',
     author_email='john_04047210@163.com',
     description='compress or decompress with huffman',
