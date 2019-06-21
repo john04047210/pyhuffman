@@ -1,9 +1,10 @@
 # Install:
-### $ python setup.py build
-### $ python setup.py install
+- $ python setup.py build
+- $ python setup.py install
 ----
 # Usage:
-## compress & decompress:
+- compress & decompress:
+python实现
 ```python
 #-*- coding:utf-8 -*-
 import huffmanModule
