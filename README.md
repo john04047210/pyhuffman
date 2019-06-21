@@ -1,10 +1,10 @@
-# Install:
+# Install from source:
 - $ python setup.py build
 - $ python setup.py install
 ----
 # Usage:
 - compress & decompress:<br>
-**python实现:**
+**python example:**
 ```python
 #-*- coding:utf-8 -*-
 import huffmanModule
@@ -23,3 +23,7 @@ def run_test():
 if __name__ == '__main__':
     run_test()
 ```
+# Upload PyPI
+- $ python -m pip install --user --upgrade setuptools wheel twine
+- $ python setup.py sdist bdist_wheel
+- $ python -m twine upload --repository-url https://upload.pypi.org/legacy/ dist/*

@@ -130,12 +130,12 @@ static PyMethodDef huffmanmethods[] = {
 
 static struct PyModuleDef huffmanmodule = {
   PyModuleDef_HEAD_INIT,
-  "pyhuffman",
+  "PycHuffman",
   "huffman compress decompress",
   -1,
   huffmanmethods
 };
 
-PyMODINIT_FUNC PyInit_pyhuffman(void) {
+PyMODINIT_FUNC PyInit_PycHuffman(void) {
   return PyModule_Create(&huffmanmodule);
 }
