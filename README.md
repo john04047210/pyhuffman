@@ -4,7 +4,7 @@
 ----
 # Usage:
 - compress & decompress:<br>
-python实现
+**python实现:**
 ```python
 #-*- coding:utf-8 -*-
 import huffmanModule
