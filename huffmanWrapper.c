@@ -10,12 +10,12 @@ PyObject* pyhuffman_compress(PyObject* self, PyObject* args) {
   unsigned char* out_filename = NULL;
   unsigned char* in_buff = NULL;
   unsigned char* out_buff = NULL;
-  unsigned long inlen = 0;
-  unsigned long outlen = 0;
+  long inlen = 0;
+  long outlen = 0;
   unsigned long rst = 0;
   size_t readlen = 0;
   int rtn = 0;
-  FILE *fp;
+  FILE* fp;
 
   if (!PyArg_ParseTuple(args, "ss", &in_filename, &out_filename)) {
     printf("parse args error...\n");
@@ -46,17 +46,17 @@ PyObject* pyhuffman_compress(PyObject* self, PyObject* args) {
   }
   outlen = inlen * 2 + 1;     // Just to prevent memory overflow, it is possible that the size becomes larger after compression.
   inlen += 1;
-  in_buff = (char*)malloc(sizeof(char) * inlen);
-  memset(in_buff, 0x00, sizeof(char) * inlen);
-  out_buff = (char*)malloc(sizeof(char) * outlen);
-  memset(out_buff, 0x00, sizeof(char) * outlen);
-  readlen = fread(in_buff, sizeof(char), inlen, fp);
+  in_buff = (unsigned char*)malloc(sizeof(unsigned char) * inlen);
+  memset(in_buff, 0x00, sizeof(unsigned char) * inlen);
+  out_buff = (unsigned char*)malloc(sizeof(unsigned char) * outlen);
+  memset(out_buff, 0x00, sizeof(unsigned char) * outlen);
+  readlen = fread(in_buff, sizeof(unsigned char), inlen, fp);
   fclose(fp);
-  rst = huffman_compress(in_buff, inlen, out_buff, outlen, huffbuf);
+  rst = huffman_compress(in_buff, (unsigned long)readlen, out_buff, (unsigned long)outlen, huffbuf);
   if (rst) {
     // compress success
     fp = fopen(out_filename, "w+b");
-    fwrite(out_buff, sizeof(char), rst, fp);
+    fwrite(out_buff, sizeof(unsigned char), rst, fp);
     fclose(fp);
   }
   free(in_buff); in_buff = 0x00;
@@ -69,8 +69,8 @@ PyObject* pyhuffman_decompress(PyObject* self, PyObject* args) {
   unsigned char* out_filename = NULL;
   unsigned char* in_buff = NULL;
   unsigned char* out_buff = NULL;
-  unsigned long inlen = 0;
-  unsigned long outlen = 0;
+  long inlen = 0;
+  long outlen = 0;
   unsigned long rst = 0;
   int rtn = 0;
   FILE *fp;
@@ -104,17 +104,17 @@ PyObject* pyhuffman_decompress(PyObject* self, PyObject* args) {
   }
   outlen = inlen * 2 + 1;     // Just to prevent memory overflow, it is possible that the size becomes larger after compression.
   inlen += 1;
-  in_buff = (char*)malloc(sizeof(char) * inlen);
-  memset(in_buff, 0x00, sizeof(char) * inlen);
-  out_buff = (char*)malloc(sizeof(char) * outlen);
-  memset(out_buff, 0x00, sizeof(char) * outlen);
-  fread(in_buff, sizeof(char), inlen, fp);
+  in_buff = (unsigned char*)malloc(sizeof(unsigned char) * inlen);
+  memset(in_buff, 0x00, sizeof(unsigned char) * inlen);
+  out_buff = (unsigned char*)malloc(sizeof(unsigned char) * outlen);
+  memset(out_buff, 0x00, sizeof(unsigned char) * outlen);
+  fread(in_buff, sizeof(unsigned char), inlen, fp);
   fclose(fp);
-  rst = huffman_decompress(in_buff, inlen, out_buff, outlen, huffbuf);
+  rst = huffman_decompress(in_buff, (unsigned long)inlen, out_buff, (unsigned long)outlen, huffbuf);
   if (rst) {
     // decompress success
     fp = fopen(out_filename, "w+b");
-    fwrite(out_buff, sizeof(char), rst - 1, fp);
+    fwrite(out_buff, sizeof(unsigned char), rst - 1, fp);
     fclose(fp);
   }
   free(in_buff); in_buff = 0x00;

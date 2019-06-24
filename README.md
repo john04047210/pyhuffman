@@ -18,6 +18,7 @@ def run_test():
     print('compress return:', rtn)
     rtn = huffmanModule.decompress(file_out, file_out_out)
     print('decompress return:', rtn)
+    
 
 
 if __name__ == '__main__':
