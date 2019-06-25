@@ -1,13 +1,14 @@
 // huffmanWrapper.c
-#include "Python.h"
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include "huffman.h"
 
 static unsigned char huffbuf[HUFFHEAP_SIZE];
 
 /*  */
 PyObject* pyhuffman_compress(PyObject* self, PyObject* args) {
-  unsigned char* in_filename = NULL;
-  unsigned char* out_filename = NULL;
+  const char* in_filename = NULL;
+  const char* out_filename = NULL;
   unsigned char* in_buff = NULL;
   unsigned char* out_buff = NULL;
   long inlen = 0;
@@ -15,7 +16,7 @@ PyObject* pyhuffman_compress(PyObject* self, PyObject* args) {
   unsigned long rst = 0;
   size_t readlen = 0;
   int rtn = 0;
-  FILE* fp;
+  FILE *fp;
 
   if (!PyArg_ParseTuple(args, "ss", &in_filename, &out_filename)) {
     printf("parse args error...\n");
@@ -46,9 +47,20 @@ PyObject* pyhuffman_compress(PyObject* self, PyObject* args) {
   }
   outlen = inlen * 2 + 1;     // Just to prevent memory overflow, it is possible that the size becomes larger after compression.
   inlen += 1;
-  in_buff = (unsigned char*)malloc(sizeof(unsigned char) * inlen);
+  in_buff = (unsigned char*)PyMem_Malloc(sizeof(unsigned char) * inlen);
+  if (NULL == in_buff) {
+    fclose(fp);
+    printf("PyMem_Malloc(in_buff) error... [%s] errno:[%d] errmsg:[%s]\n", in_filename, errno, strerror(errno));
+    return PyErr_NoMemory();
+  }
   memset(in_buff, 0x00, sizeof(unsigned char) * inlen);
-  out_buff = (unsigned char*)malloc(sizeof(unsigned char) * outlen);
+  out_buff = (unsigned char*)PyMem_Malloc(sizeof(unsigned char) * outlen);
+  if (NULL == out_buff) {
+    fclose(fp);
+    PyMem_Free(in_buff); in_buff = 0x00;
+    printf("PyMem_Malloc(out_buff) error... [%s] errno:[%d] errmsg:[%s]\n", in_filename, errno, strerror(errno));
+    return PyErr_NoMemory();
+  }
   memset(out_buff, 0x00, sizeof(unsigned char) * outlen);
   readlen = fread(in_buff, sizeof(unsigned char), inlen, fp);
   fclose(fp);
@@ -59,19 +71,20 @@ PyObject* pyhuffman_compress(PyObject* self, PyObject* args) {
     fwrite(out_buff, sizeof(unsigned char), rst, fp);
     fclose(fp);
   }
-  free(in_buff); in_buff = 0x00;
-  free(out_buff); out_buff = 0x00;
-  return Py_BuildValue("l", rst);
+  PyMem_Free(in_buff); in_buff = 0x00;
+  PyMem_Free(out_buff); out_buff = 0x00;
+  return Py_BuildValue("k", rst);
 }
 
 PyObject* pyhuffman_decompress(PyObject* self, PyObject* args) {
-  unsigned char* in_filename = NULL;
-  unsigned char* out_filename = NULL;
+  const char* in_filename = NULL;
+  const char* out_filename = NULL;
   unsigned char* in_buff = NULL;
   unsigned char* out_buff = NULL;
   long inlen = 0;
   long outlen = 0;
   unsigned long rst = 0;
+  size_t readlen = 0;
   int rtn = 0;
   FILE *fp;
 
@@ -104,22 +117,33 @@ PyObject* pyhuffman_decompress(PyObject* self, PyObject* args) {
   }
   outlen = inlen * 2 + 1;     // Just to prevent memory overflow, it is possible that the size becomes larger after compression.
   inlen += 1;
-  in_buff = (unsigned char*)malloc(sizeof(unsigned char) * inlen);
+  in_buff = (unsigned char*)PyMem_Malloc(sizeof(unsigned char) * inlen);
+  if (NULL == in_buff) {
+    fclose(fp);
+    printf("PyMem_Malloc(in_buff) error... [%s] errno:[%d] errmsg:[%s]\n", in_filename, errno, strerror(errno));
+    return PyErr_NoMemory();
+  }
   memset(in_buff, 0x00, sizeof(unsigned char) * inlen);
-  out_buff = (unsigned char*)malloc(sizeof(unsigned char) * outlen);
+  out_buff = (unsigned char*)PyMem_Malloc(sizeof(unsigned char) * outlen);
+  if (NULL == out_buff) {
+    fclose(fp);
+    PyMem_Free(in_buff); in_buff = 0x00;
+    printf("PyMem_Malloc(out_buff) error... [%s] errno:[%d] errmsg:[%s]\n", in_filename, errno, strerror(errno));
+    return PyErr_NoMemory();
+  }
   memset(out_buff, 0x00, sizeof(unsigned char) * outlen);
-  fread(in_buff, sizeof(unsigned char), inlen, fp);
+  readlen = fread(in_buff, sizeof(unsigned char), inlen, fp);
   fclose(fp);
-  rst = huffman_decompress(in_buff, (unsigned long)inlen, out_buff, (unsigned long)outlen, huffbuf);
+  rst = huffman_decompress(in_buff, (unsigned long)readlen, out_buff, (unsigned long)outlen, huffbuf);
   if (rst) {
     // decompress success
     fp = fopen(out_filename, "w+b");
-    fwrite(out_buff, sizeof(unsigned char), rst - 1, fp);
+    fwrite(out_buff, sizeof(unsigned char), rst, fp);
     fclose(fp);
   }
-  free(in_buff); in_buff = 0x00;
-  free(out_buff); out_buff = 0x00;
-  return Py_BuildValue("l", rst);
+  PyMem_Free((void *)in_buff); in_buff = 0x00;
+  PyMem_Free((void *)out_buff); out_buff = 0x00;
+  return Py_BuildValue("k", rst);
 }
 
 static PyMethodDef huffmanmethods[] = {
