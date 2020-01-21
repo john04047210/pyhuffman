@@ -16,6 +16,7 @@ setup(
     project_urls={
         'Source': 'https://github.com/john04047210/pyhuffman.git',
     },
+    zip_safe=True,
     ext_modules=[
         Extension('PycHuffman', ['huffman.c','huffmanWrapper.c'], include_dirs=['./'])
     ],

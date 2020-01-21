@@ -115,7 +115,7 @@ PyObject* pyhuffman_decompress(PyObject* self, PyObject* args) {
     printf("fseek error[SEEK_SET]... [%s] errno:[%d] errmsg:[%s]\n", in_filename, errno, strerror(errno));
     return Py_BuildValue("");
   }
-  outlen = inlen * 2 + 1;     // Just to prevent memory overflow, it is possible that the size becomes larger after compression.
+  outlen = inlen * 4 + 1;     // Just to prevent memory overflow, it is possible that the size becomes larger after compression.
   inlen += 1;
   in_buff = (unsigned char*)PyMem_Malloc(sizeof(unsigned char) * inlen);
   if (NULL == in_buff) {
