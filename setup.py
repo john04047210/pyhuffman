@@ -13,6 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/john04047210/pyhuffman.git',
+    zip_safe=True,
     project_urls={
         'Source': 'https://github.com/john04047210/pyhuffman.git',
     },
